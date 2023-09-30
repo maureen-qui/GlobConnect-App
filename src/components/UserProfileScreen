@@ -1,0 +1,90 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+
+const UserProfileScreen = ({ userId }) => {
+  const [profile, setProfile] = useState({
+    interests: [],
+    skills: [],
+    objectives: [],
+  });
+
+  useEffect(() => {
+    // Fetch the user's profile data
+    fetch(`http://your-api-url/users/${userId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setProfile(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  }, [userId]);
+
+  const handleUpdateProfile = () => {
+    // Send a PUT request to update the user's profile
+    fetch(`http://your-api-url/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(profile),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        // Handle profile update success or errors
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.heading}>User Profile</Text>
+      <Text>Interests:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Interests (comma-separated)"
+        value={profile.interests.join(', ')}
+        onChangeText={(text) => setProfile({ ...profile, interests: text.split(', ') })}
+      />
+      <Text>Skills:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Skills (comma-separated)"
+        value={profile.skills.join(', ')}
+        onChangeText={(text) => setProfile({ ...profile, skills: text.split(', ') })}
+      />
+      <Text>Objectives:</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Objectives (comma-separated)"
+        value={profile.objectives.join(', ')}
+        onChangeText={(text) => setProfile({ ...profile, objectives: text.split(', ') })}
+      />
+      <Button title="Update Profile" onPress={handleUpdateProfile} />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 16,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 16,
+  },
+});
+
+export default UserProfileScreen;

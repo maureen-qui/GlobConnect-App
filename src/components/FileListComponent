@@ -1,0 +1,51 @@
+import React, { useState, useEffect } from 'react';
+import { View, Text, FlatList, Button, Linking } from 'react-native';
+
+const FileListComponent = ({ groupId }) => {
+  const [files, setFiles] = useState([]);
+
+  useEffect(() => {
+    // Implement logic to fetch files by group ID from the server
+    fetch(`http://your-api-url/groups/${groupId}/files`)
+      .then((response) => response.json())
+      .then((data) => {
+        setFiles(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching files:', error);
+      });
+  }, [groupId]);
+
+  // Function to handle file download
+  const handleFileDownload = (fileUrl) => {
+    // Use Linking to open the file URL
+    Linking.openURL(fileUrl)
+      .then(() => {
+        console.log('File opened successfully.');
+      })
+      .catch((error) => {
+        console.error('Error opening file:', error);
+      });
+  };
+
+  return (
+    <View>
+      <Text>Files in this group:</Text>
+      <FlatList
+        data={files}
+        keyExtractor={(item) => item._id}
+        renderItem={({ item }) => (
+          <View>
+            <Text>{item.filename}</Text>
+            <Button
+              title="Download"
+              onPress={() => handleFileDownload(item.fileUrl)}
+            />
+          </View>
+        )}
+      />
+    </View>
+  );
+};
+
+export default FileListComponent;

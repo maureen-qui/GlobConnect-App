@@ -1,0 +1,17 @@
+import React from 'react';
+import { View, Button } from 'react-native';
+
+const AnotherComponent = ({ navigation }) => {
+  return (
+    <View>
+      <Button
+        title="Go to Map"
+        onPress={() => {
+          navigation.navigate('Map'); // Make sure 'Map' matches the screen name in your navigator
+        }}
+      />
+    </View>
+  );
+};
+
+export default AnotherComponent;

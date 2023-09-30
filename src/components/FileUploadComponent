@@ -1,0 +1,71 @@
+import React, { useState } from 'react';
+import { View, Text, Button, TextInput } from 'react-native';
+import DocumentPicker from 'react-native-document-picker';
+
+const FileUploadComponent = ({ groupId }) => {
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const handleFilePick = async () => {
+    try {
+      const result = await DocumentPicker.pick({
+        type: [DocumentPicker.types.allFiles],
+      });
+
+      setSelectedFile(result);
+    } catch (err) {
+      if (DocumentPicker.isCancel(err)) {
+        // User canceled the file picker
+      } else {
+        throw err;
+      }
+    }
+  };
+
+  const handleFileUpload = async () => {
+    if (selectedFile) {
+      // Create a FormData object to send the file as multipart/form-data
+      const formData = new FormData();
+      formData.append('file', {
+        uri: selectedFile.uri,
+        type: selectedFile.type,
+        name: selectedFile.name,
+      });
+
+      try {
+        // Send a POST request to the server with the FormData
+        const response = await fetch('http://your-api-url/upload', {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+
+        if (response.ok) {
+          // File upload successful
+          console.log('File uploaded successfully.');
+        } else {
+          // Handle the error if the upload fails
+          console.error('File upload failed.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
+  };
+
+  return (
+    <View>
+      <Text>Select a file to upload:</Text>
+      <Button title="Choose File" onPress={handleFilePick} />
+      {selectedFile && (
+        <View>
+          <Text>Selected File: {selectedFile.name}</Text>
+          <Button title="Upload File" onPress={handleFileUpload} />
+        </View>
+      )}
+    </View>
+  );
+};
+
+export default FileUploadComponent;
